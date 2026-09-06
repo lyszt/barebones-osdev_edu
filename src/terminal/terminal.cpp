@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <message/message.h>
 #include <string/string.h>
 #include <terminal/terminal.h>
 #include <vga/vga.h>

@@ -14,7 +14,7 @@ ASM_OBJS := $(ASM)/boot/boot.o
 INIT_HEAD := $(ASM)/crt/init_prologue.o
 INIT_TAIL := $(ASM)/crt/init_epilogue.o
 
-OBJS := src/kernel.o src/terminal/terminal.o src/string/string.o
+OBJS := src/kernel.o src/terminal/terminal.o src/message/message.o src/string/string.o
 
 LINK_LIST := $(INIT_HEAD) $(CRTBEGIN) $(ASM_OBJS) $(OBJS) $(CRTEND) $(INIT_TAIL)
 
@@ -46,6 +46,9 @@ src/kernel.o: src/kernel.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 src/terminal/terminal.o: src/terminal/terminal.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+src/message/message.o: src/message/message.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 src/string/string.o: src/string/string.cpp

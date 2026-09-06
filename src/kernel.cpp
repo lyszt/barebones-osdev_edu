@@ -1,4 +1,5 @@
 #include <kernel.h>
+#include <message/message.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <terminal/terminal.h>
