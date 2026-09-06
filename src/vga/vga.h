@@ -22,14 +22,17 @@ enum vga_color {
 	VGA_COLOR_WHITE = 15,
 };
 
-static inline uint8_t vga_entry_color(enum vga_color foreground_color, enum vga_color background_color)
-{
-	return static_cast<uint8_t>(foreground_color) | static_cast<uint8_t>(background_color) << 4;
-}
+class Vga {
+public:
+	static uint8_t entry_color(enum vga_color foreground_color, enum vga_color background_color)
+	{
+		return static_cast<uint8_t>(foreground_color) | static_cast<uint8_t>(background_color) << 4;
+	}
 
-static inline uint16_t vga_entry(unsigned char character, uint8_t color_byte)
-{
-	return static_cast<uint16_t>(character) | static_cast<uint16_t>(color_byte) << 8;
-}
+	static uint16_t entry(unsigned char character, uint8_t color_byte)
+	{
+		return static_cast<uint16_t>(character) | static_cast<uint16_t>(color_byte) << 8;
+	}
+};
 
 #endif

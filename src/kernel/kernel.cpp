@@ -13,6 +13,6 @@
 
 extern "C" void kernel_main(void)
 {
-	terminal_initialize();
-	terminal_writestring("Hello, kernel World!\n");
+	terminal.initialize();
+	terminal.writestring("Hello, kernel World!\n");
 }

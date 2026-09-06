@@ -1,6 +1,6 @@
 #include <string/string.h>
 
-size_t strlen(const char* string)
+size_t String::length(const char* string)
 {
 	size_t length = 0;
 	while (string[length])

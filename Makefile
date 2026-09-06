@@ -4,7 +4,7 @@ CXXFLAGS := -std=gnu++17 -ffreestanding -fno-exceptions -fno-rtti -O2 -Wall -Wex
 LDFLAGS  := -ffreestanding -O2 -nostdlib
 LIBS     := -lgcc
 
-OBJS := src/boot.o src/kernel/kernel.o src/terminal/terminal.o src/string/strlen.o
+OBJS := src/boot.o src/kernel/kernel.o src/terminal/terminal.o src/string/string.o
 
 .PHONY: all compile clean run run-iso
 
@@ -30,8 +30,8 @@ src/kernel/kernel.o: src/kernel/kernel.cpp
 src/terminal/terminal.o: src/terminal/terminal.cpp
 	$(CXX) $(CXXFLAGS) -c src/terminal/terminal.cpp -o src/terminal/terminal.o
 
-src/string/strlen.o: src/string/strlen.cpp
-	$(CXX) $(CXXFLAGS) -c src/string/strlen.cpp -o src/string/strlen.o
+src/string/string.o: src/string/string.cpp
+	$(CXX) $(CXXFLAGS) -c src/string/string.cpp -o src/string/string.o
 
 clean:
 	rm -rf myos myos.iso isodir $(OBJS)

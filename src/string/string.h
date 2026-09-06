@@ -3,6 +3,9 @@
 
 #include <stddef.h>
 
-size_t strlen(const char* string);
+class String {
+public:
+	static size_t length(const char* string);
+};
 
 #endif
