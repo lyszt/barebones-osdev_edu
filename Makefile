@@ -4,7 +4,19 @@ CXXFLAGS := -std=gnu++17 -ffreestanding -fno-exceptions -fno-rtti -O2 -Wall -Wex
 LDFLAGS  := -ffreestanding -O2 -nostdlib
 LIBS     := -lgcc
 
-OBJS := src/boot.o src/kernel/kernel.o src/terminal/terminal.o src/string/string.o
+ASM      := src/asm
+LINKER   := $(ASM)/linker.ld
+
+CRTBEGIN := $(shell $(CXX) $(CXXFLAGS) -print-file-name=crtbegin.o)
+CRTEND   := $(shell $(CXX) $(CXXFLAGS) -print-file-name=crtend.o)
+
+ASM_OBJS := $(ASM)/boot/boot.o
+INIT_HEAD := $(ASM)/crt/init_prologue.o
+INIT_TAIL := $(ASM)/crt/init_epilogue.o
+
+OBJS := src/kernel.o src/terminal/terminal.o src/string/string.o
+
+LINK_LIST := $(INIT_HEAD) $(CRTBEGIN) $(ASM_OBJS) $(OBJS) $(CRTEND) $(INIT_TAIL)
 
 .PHONY: all compile clean run run-iso
 
@@ -12,8 +24,8 @@ all: myos
 
 compile: myos.iso
 
-myos: $(OBJS) src/linker.ld
-	$(CXX) -T src/linker.ld -o myos $(LDFLAGS) $(OBJS) $(LIBS)
+myos: $(INIT_HEAD) $(INIT_TAIL) $(ASM_OBJS) $(OBJS) $(LINKER)
+	$(CXX) -T $(LINKER) -o myos $(LDFLAGS) $(LINK_LIST) $(LIBS)
 
 myos.iso: myos grub.cfg
 	mkdir -p isodir/boot/grub
@@ -21,20 +33,26 @@ myos.iso: myos grub.cfg
 	cp grub.cfg isodir/boot/grub/grub.cfg
 	grub-mkrescue -o myos.iso isodir
 
-src/boot.o: src/boot.s
-	$(AS) src/boot.s -o src/boot.o
+$(ASM)/crt/init_prologue.o: $(ASM)/crt/init_prologue.s
+	$(AS) $< -o $@
 
-src/kernel/kernel.o: src/kernel/kernel.cpp
-	$(CXX) $(CXXFLAGS) -c src/kernel/kernel.cpp -o src/kernel/kernel.o
+$(ASM)/crt/init_epilogue.o: $(ASM)/crt/init_epilogue.s
+	$(AS) $< -o $@
+
+$(ASM)/boot/boot.o: $(ASM)/boot/boot.s
+	$(AS) $< -o $@
+
+src/kernel.o: src/kernel.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 src/terminal/terminal.o: src/terminal/terminal.cpp
-	$(CXX) $(CXXFLAGS) -c src/terminal/terminal.cpp -o src/terminal/terminal.o
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 src/string/string.o: src/string/string.cpp
-	$(CXX) $(CXXFLAGS) -c src/string/string.cpp -o src/string/string.o
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -rf myos myos.iso isodir $(OBJS)
+	rm -rf myos myos.iso isodir $(INIT_HEAD) $(INIT_TAIL) $(ASM_OBJS) $(OBJS)
 
 run: myos
 	qemu-system-i386 -kernel myos -display gtk
