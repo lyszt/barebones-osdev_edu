@@ -37,13 +37,6 @@ void Terminal::putchar(char character) {
 
   // Character handling
   unsigned char unsigned_character = character;
-  switch (unsigned_character) {
-  case '\n':
-    this->newline();
-    return;
-  default:
-    break;
-  }
 
   this->put_entry_at(unsigned_character, this->terminal_color,
                      this->cursor_column, this->cursor_row);
@@ -55,8 +48,5 @@ void Terminal::putchar(char character) {
 }
 
 void Terminal::write(Message *text) {
-  do {
-    this->putchar(text->content[text->reading_index]);
-
-  } while (!text->read().first);
+  while(!text->read().first){};
 }

@@ -6,30 +6,7 @@
 #include <string/string.h>
 #include <types/types.h>
 
-class Message {
-public:
-  const char *content;
-  int length;
-  int reading_index = 0;
-  uint8_t color_byte;
-
-  Message(const char *text) {
-    this->content = text;
-    this->length = String::length(text);
-  }
-  pair<bool, char> read() {
-    pair<bool, char> reading_content;
-    if (content[reading_index] == '\0' || reading_index >= length) {
-      reading_content = pair<bool, char>{true, content[reading_index]};
-    } else {
-      reading_content = pair<bool, char>{false, content[reading_index]};
-    }
-    reading_index++;
-    return reading_content;
-  }
-};
-
-
+class Message;
 
 class Terminal {
 public:
@@ -52,6 +29,57 @@ private:
   uint16_t *terminal_buffer;
 };
 
-extern Terminal terminal;
+enum charType { REGULAR, END_STRING, LINE_BREAK };
+
+class Message {
+public:
+  const char *content;
+  int length;
+  int reading_index = 0;
+  uint8_t color_byte;
+  Terminal *terminal;
+
+  Message(const char *text, Terminal *terminal) {
+    this->content = text;
+    this->terminal = terminal;
+    this->length = String::length(text);
+  }
+
+  pair<bool, char> read() {
+    char c = content[reading_index];
+
+    switch (readSpecialChars(c)) {
+    case LINE_BREAK:
+      terminal->newline();
+      reading_index++;
+      return pair<bool, char>{false, c};
+    case END_STRING:
+      reading_index++;
+      return pair<bool, char>{true, c};
+    case REGULAR:
+      break;
+    }
+
+    if (reading_index >= length)
+      return pair<bool, char>{true, c};
+
+    terminal->putchar(c);
+    reading_index++;
+    return pair<bool, char>{false, c};
+  }
+
+private:
+  charType readSpecialChars(char unsigned_char) {
+    switch (unsigned_char) {
+    case '\n':
+      return LINE_BREAK;
+    case '\0':
+      this->reading_index = this->length;
+      return END_STRING;
+    default:
+      return REGULAR;
+    }
+  }
+};
 
 #endif
